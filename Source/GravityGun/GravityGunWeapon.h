@@ -44,7 +44,9 @@ public:
 	void PrimaryAction();
 
 	//Secondary Action of the weapon
-	void SecondaryAction();
+	void ActivateSecondaryAction();
+	//Secondary Action of the weapon
+	void ReleaseSecondaryAction();
 
 protected:
 	// Called when the game starts or when spawned

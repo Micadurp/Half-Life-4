@@ -54,7 +54,9 @@ protected:
 	/** Primary Weapon Action */
 	void OnPrimaryAction();
 	/** Secondary Weapon Action */
-	void OnSecondaryAction();
+	void ActivateSecondaryAction();
+	/** Secondary Weapon Action */
+	void ReleaseSecondaryAction();
 
 	/** Handles moving forward/backward */
 	void MoveForward(float Val);

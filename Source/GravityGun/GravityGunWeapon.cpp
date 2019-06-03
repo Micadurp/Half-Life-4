@@ -76,14 +76,19 @@ void AGravityGunWeapon::PrimaryAction()
 }
 
 // Drags objects towards weapon and grabs them, drops object if an object is grabbed
-void AGravityGunWeapon::SecondaryAction()
+void AGravityGunWeapon::ActivateSecondaryAction()
 {
 	// Check if something is grabbed already
 	if (PhysicsHandle->GetGrabbedComponent() == nullptr)
 	{
-		FHitResult Hit = GetFirstBody(GrabReach);
-		auto ComponentToGrab = Hit.GetComponent();
-		auto ActorHit = Hit.GetActor();
+		FHitResult DragHit = GetFirstBody(Range);
+
+		// Start dragging object towards player, grab if within range
+		// Maybe check if the Draghit is within Grabreach and then grab it?
+
+		FHitResult GrabHit = GetFirstBody(GrabReach);
+		auto ComponentToGrab = GrabHit.GetComponent();
+		auto ActorHit = GrabHit.GetActor();
 
 		if (ActorHit)
 		{
@@ -95,6 +100,11 @@ void AGravityGunWeapon::SecondaryAction()
 	{
 		PhysicsHandle->ReleaseComponent();
 	}
+}
+
+void AGravityGunWeapon::ReleaseSecondaryAction()
+{
+	// Should stop the dragging if we are dragging
 }
 
 FHitResult AGravityGunWeapon::GetFirstBody(float range) const
