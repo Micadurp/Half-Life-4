@@ -5,6 +5,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Animation/AnimInstance.h"
+#include "DrawDebugHelpers.h"
 
 
 // Sets default values
@@ -43,16 +44,35 @@ void AGravityGunWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	FVector LineTraceEnd = GetReachLineEnd(GrabReach);
+
+	if (!PhysicsHandle) { return; }
+	if (PhysicsHandle->GrabbedComponent)
+	{
+		PhysicsHandle->SetTargetLocation(LineTraceEnd);
+	}
+
 }
 
 // Will shoot an object away, also shoots grabbed object away if one is held
 void AGravityGunWeapon::PrimaryAction()
 {
-	FHitResult Hit = GetFirstBodyInReach();
-	auto ComponentToGrab = Hit.GetComponent();
+	FHitResult Hit = GetFirstBody(Range);
+	auto ComponentToPush = Hit.GetComponent();
 	auto ActorHit = Hit.GetActor();
 
-	// Add impulse to phys object within range away from weapon
+	if (ComponentToPush)
+	{
+		PhysicsHandle->ReleaseComponent();
+
+		FVector Direction = Hit.Location - this->GetActorLocation();
+		Direction.Normalize();
+
+		UE_LOG(LogTemp, Warning, TEXT("direction: %s"), *Direction.ToString())
+		UE_LOG(LogTemp, Warning, TEXT("Component: %s"), *ComponentToPush->GetName())
+		ComponentToPush->AddImpulse(Direction * PushForce, NAME_None, true);
+		// Add impulse to phys object within range away from weapon
+	}
 }
 
 // Drags objects towards weapon and grabs them, drops object if an object is grabbed
@@ -61,8 +81,7 @@ void AGravityGunWeapon::SecondaryAction()
 	// Check if something is grabbed already
 	if (PhysicsHandle->GetGrabbedComponent() == nullptr)
 	{
-
-		FHitResult Hit = GetFirstBodyInReach();
+		FHitResult Hit = GetFirstBody(GrabReach);
 		auto ComponentToGrab = Hit.GetComponent();
 		auto ActorHit = Hit.GetActor();
 
@@ -78,12 +97,12 @@ void AGravityGunWeapon::SecondaryAction()
 	}
 }
 
-FHitResult AGravityGunWeapon::GetFirstBodyInReach() const
+FHitResult AGravityGunWeapon::GetFirstBody(float range) const
 {
 	FHitResult Hit;
 	FCollisionQueryParams TraceParameters(FName(TEXT("")), false, GetOwner());
 	bool HitSomething = false;
-	HitSomething = GetWorld()->LineTraceSingleByObjectType(Hit, GetReachLineStart(), GetReachLineEnd(), FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody), TraceParameters);
+	HitSomething = GetWorld()->LineTraceSingleByObjectType(Hit, GetReachLineStart(), GetReachLineEnd(range), FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody), TraceParameters);
 
 	AActor* ActorHit = Hit.GetActor();
 
@@ -94,7 +113,7 @@ FHitResult AGravityGunWeapon::GetFirstBodyInReach() const
 	return Hit;
 }
 
-FVector AGravityGunWeapon::GetReachLineStart() const
+FVector AGravityGunWeapon::GetReachLineStart() const // TODO should this be from the view of the gun?
 {
 	FVector ActorPosition;
 	FRotator ActorRotation;
@@ -103,11 +122,11 @@ FVector AGravityGunWeapon::GetReachLineStart() const
 	return ActorPosition;
 }
 
-FVector AGravityGunWeapon::GetReachLineEnd() const
+FVector AGravityGunWeapon::GetReachLineEnd(float range) const
 {
 	FVector ActorPosition;
 	FRotator ActorRotation;
 	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(ActorPosition, ActorRotation);
 
-	return ActorPosition + (ActorRotation.Vector() * Reach);
+	return ActorPosition + (ActorRotation.Vector() * range);
 }

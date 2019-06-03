@@ -56,18 +56,21 @@ public:
 
 private:
 	UPROPERTY(EditAnywhere)
-	float Reach = 100.f;
+	float Range = 1000.f;
 
 	UPROPERTY(EditAnywhere)
-	float PushForce = 20.f;
+	float GrabReach = 300.f;
+
+	UPROPERTY(EditAnywhere)
+	float PushForce = 10000.f;
 
 	UPROPERTY(EditAnywhere)
 	float PullForce = 20.f;
 		
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;
 
-	FHitResult GetFirstBodyInReach() const;
+	FHitResult GetFirstBody(float range) const;
 	FVector GetReachLineStart() const;
-	FVector GetReachLineEnd() const;
+	FVector GetReachLineEnd(float range) const;
 
 };
