@@ -30,6 +30,12 @@ void AGravityGunWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 
+	PhysicsHandle = this->FindComponentByClass<UPhysicsHandleComponent>();
+	if (PhysicsHandle == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s missing physics handle component"), *this->GetName())
+	}
+
 }
 
 // Called every frame
@@ -39,50 +45,69 @@ void AGravityGunWeapon::Tick(float DeltaTime)
 
 }
 
+// Will shoot an object away, also shoots grabbed object away if one is held
 void AGravityGunWeapon::PrimaryAction()
 {
+	FHitResult Hit = GetFirstBodyInReach();
+	auto ComponentToGrab = Hit.GetComponent();
+	auto ActorHit = Hit.GetActor();
+
 	// Add impulse to phys object within range away from weapon
 }
 
+// Drags objects towards weapon and grabs them, drops object if an object is grabbed
 void AGravityGunWeapon::SecondaryAction()
 {
-	// Add force to phys object within range towards weapon and grab object if close enough
+	// Check if something is grabbed already
+	if (PhysicsHandle->GetGrabbedComponent() == nullptr)
+	{
+
+		FHitResult Hit = GetFirstBodyInReach();
+		auto ComponentToGrab = Hit.GetComponent();
+		auto ActorHit = Hit.GetActor();
+
+		if (ActorHit)
+		{
+			PhysicsHandle->GrabComponent(ComponentToGrab, NAME_None, ComponentToGrab->GetOwner()->GetActorLocation(), true);
+		}
+		// Add force to phys object within range towards weapon and grab object if close enough
+	}
+	else // If something is grabbed already drop it
+	{
+		PhysicsHandle->ReleaseComponent();
+	}
 }
 
-/*void AGravityGunWeapon::PrimaryAction()
+FHitResult AGravityGunWeapon::GetFirstBodyInReach() const
 {
-	// try and fire a projectile
-	if (ProjectileClass != NULL)
+	FHitResult Hit;
+	FCollisionQueryParams TraceParameters(FName(TEXT("")), false, GetOwner());
+	bool HitSomething = false;
+	HitSomething = GetWorld()->LineTraceSingleByObjectType(Hit, GetReachLineStart(), GetReachLineEnd(), FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody), TraceParameters);
+
+	AActor* ActorHit = Hit.GetActor();
+
+	if (HitSomething)
 	{
-		UWorld* const World = GetWorld();
-		if (World != NULL)
-		{
-			const FRotator SpawnRotation = FP_MuzzleLocation->GetComponentRotation();
-			// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
-			const FVector SpawnLocation = FP_MuzzleLocation->GetComponentLocation();
-
-			//Set Spawn Collision Handling Override
-			FActorSpawnParameters ActorSpawnParams;
-			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-
-			// spawn the projectile at the muzzle
-			World->SpawnActor<AGravityGunProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-		}
+		UE_LOG(LogTemp, Warning, TEXT("Hit: %s"), *ActorHit->GetName())
 	}
+	return Hit;
+}
 
-	// try and play the sound if specified
-	if (FireSound != NULL)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
-	}
+FVector AGravityGunWeapon::GetReachLineStart() const
+{
+	FVector ActorPosition;
+	FRotator ActorRotation;
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(ActorPosition, ActorRotation);
 
-	// try and play a firing animation if specified
-	if (FireAnimation != NULL)
-	{
-		// Get the animation object for the arms mesh
-		if (AnimInstance != NULL)
-		{
-			AnimInstance->Montage_Play(FireAnimation, 1.f);
-		}
-	}
-}*/
+	return ActorPosition;
+}
+
+FVector AGravityGunWeapon::GetReachLineEnd() const
+{
+	FVector ActorPosition;
+	FRotator ActorRotation;
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(ActorPosition, ActorRotation);
+
+	return ActorPosition + (ActorRotation.Vector() * Reach);
+}

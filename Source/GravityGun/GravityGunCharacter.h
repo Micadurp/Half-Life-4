@@ -50,9 +50,11 @@ private:
 	AGravityGunWeapon * GravGun;
 
 protected:
-	
-	/** Primary Action */
+
+	/** Primary Weapon Action */
 	void OnPrimaryAction();
+	/** Secondary Weapon Action */
+	void OnSecondaryAction();
 
 	/** Handles moving forward/backward */
 	void MoveForward(float Val);

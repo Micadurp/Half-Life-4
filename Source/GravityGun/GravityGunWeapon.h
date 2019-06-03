@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "PhysicsEngine/PhysicsHandleComponent.h"	
 #include "GravityGunWeapon.generated.h"
 
 UCLASS(config=Game)
@@ -41,6 +42,7 @@ public:
 
 	//Primary Action of the weapon
 	void PrimaryAction();
+
 	//Secondary Action of the weapon
 	void SecondaryAction();
 
@@ -51,5 +53,21 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+private:
+	UPROPERTY(EditAnywhere)
+	float Reach = 100.f;
+
+	UPROPERTY(EditAnywhere)
+	float PushForce = 20.f;
+
+	UPROPERTY(EditAnywhere)
+	float PullForce = 20.f;
+		
+	UPhysicsHandleComponent* PhysicsHandle = nullptr;
+
+	FHitResult GetFirstBodyInReach() const;
+	FVector GetReachLineStart() const;
+	FVector GetReachLineEnd() const;
 
 };

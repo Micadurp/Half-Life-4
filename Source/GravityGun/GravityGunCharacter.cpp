@@ -66,8 +66,9 @@ void AGravityGunCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
-	// Bind fire event
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AGravityGunCharacter::OnPrimaryAction); //TODO change input from Fire to something more resonable
+	// Bind Weapon action events events
+	PlayerInputComponent->BindAction("WeaponPrimaryAction", IE_Pressed, this, &AGravityGunCharacter::OnPrimaryAction);
+	PlayerInputComponent->BindAction("WeaponSecondaryAction", IE_Pressed, this, &AGravityGunCharacter::OnSecondaryAction);
 
 	// Bind movement events
 	PlayerInputComponent->BindAxis("MoveForward", this, &AGravityGunCharacter::MoveForward);
@@ -85,6 +86,11 @@ void AGravityGunCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 void AGravityGunCharacter::OnPrimaryAction()
 {
 	GravGun->PrimaryAction();
+}
+
+void AGravityGunCharacter::OnSecondaryAction()
+{
+	GravGun->SecondaryAction();
 }
 
 void AGravityGunCharacter::MoveForward(float Value)
