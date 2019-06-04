@@ -18,6 +18,7 @@ AGravityGunWeapon::AGravityGunWeapon()
 	Weapon_Mesh->SetOnlyOwnerSee(false);
 	Weapon_Mesh->bCastDynamicShadow = false;
 	Weapon_Mesh->CastShadow = false;
+	Weapon_Mesh->SetupAttachment(RootComponent);
 
 	// Create Muzzle Location
 	FP_MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
@@ -86,6 +87,22 @@ void AGravityGunWeapon::PrimaryAction()
 
 		// Add impulse to phys object within range away from weapon
 		ComponentToPush->AddImpulse(Direction * PushImpulse, NAME_None, true);
+
+		// try and play the sound if specified
+		if (FireSound != NULL)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+		}
+
+		// try and play a firing animation if specified
+		if (FireAnimation != NULL)
+		{
+			// Get the animation object for the arms mesh
+			if (AnimInstance != NULL)
+			{
+				AnimInstance->Montage_Play(FireAnimation, 1.f);
+			}
+		}
 	}
 }
 
