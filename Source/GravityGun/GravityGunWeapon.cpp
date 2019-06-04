@@ -23,7 +23,6 @@ AGravityGunWeapon::AGravityGunWeapon()
 	FP_MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
 	FP_MuzzleLocation->SetupAttachment(Gun_Mesh);
 	FP_MuzzleLocation->SetRelativeLocation(FVector(0.2f, 48.4f, -10.6f));
-
 }
 
 // Called when the game starts or when spawned
@@ -44,9 +43,10 @@ void AGravityGunWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-
-	if (PhysicsHandle != nullptr) // Don't crash if Physics Handle isn't added
+	// Don't crash if Physics Handle isn't added
+	if (PhysicsHandle != nullptr) 
 	{
+		// If we are pulling and we have hit an actor, give object a force towards the weapon
 		if (pulling && GravGunHit.GetActor() != nullptr)
 		{
 			auto HitComponent = GravGunHit.GetComponent();
@@ -63,6 +63,7 @@ void AGravityGunWeapon::Tick(float DeltaTime)
 		}
 		else if (PhysicsHandle->GrabbedComponent)
 		{
+			// If a we have grabbed something hold it infront
 			FVector GrabLineEnd = GetReachLineEnd(GrabReach);
 			PhysicsHandle->SetTargetLocation(GrabLineEnd);
 		}
@@ -70,7 +71,11 @@ void AGravityGunWeapon::Tick(float DeltaTime)
 
 }
 
-// Will shoot an object away, also shoots grabbed object away if one is held
+void AGravityGunWeapon::SetAnimInstance(UAnimInstance* _AnimInstance)
+{
+	AnimInstance = _AnimInstance;
+}
+
 void AGravityGunWeapon::PrimaryAction()
 {
 	FHitResult Hit = GetFirstBody(Range);
@@ -84,17 +89,17 @@ void AGravityGunWeapon::PrimaryAction()
 		FVector Direction = Hit.Location - this->GetActorLocation();
 		Direction.Normalize();
 
-		ComponentToPush->AddImpulse(Direction * PushForce, NAME_None, true);
 		// Add impulse to phys object within range away from weapon
+		ComponentToPush->AddImpulse(Direction * PushImpulse, NAME_None, true);
 	}
 }
 
-// Drags objects towards weapon and grabs them, drops object if an object is grabbed
 void AGravityGunWeapon::ActivateSecondaryAction()
 {
 	// Check if something is grabbed already
 	if (PhysicsHandle->GetGrabbedComponent() == nullptr)
 	{
+		// Find first object in range and start pulling it
 		pulling = true;
 		GravGunHit = GetFirstBody(Range);
 		auto ComponentToGrab = GravGunHit.GetComponent();
@@ -105,8 +110,9 @@ void AGravityGunWeapon::ActivateSecondaryAction()
 			pulling = true;
 		}
 	}
-	else // If something is grabbed already drop it
-	{
+	else
+	{ 
+		// If something is grabbed already drop it
 		pulling = false;
 		PhysicsHandle->ReleaseComponent();
 	}
@@ -122,29 +128,29 @@ void AGravityGunWeapon::ReleaseSecondaryAction()
 	}
 }
 
-// Shoots line trace forward and will return a hitresult if it hit a physics object
-FHitResult AGravityGunWeapon::GetFirstBody(float range) const
+FHitResult AGravityGunWeapon::GetFirstBody(float _Range) const
 {
 	FHitResult Hit;
 	FCollisionQueryParams TraceParameters(FName(TEXT("")), false, GetOwner());
 	bool HitSomething = false;
-	HitSomething = GetWorld()->LineTraceSingleByObjectType(Hit, GetReachLineStart(), GetReachLineEnd(range), FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody), TraceParameters);
 
-	AActor* ActorHit = Hit.GetActor();
+	// Checks if any physics objects are in range
+	HitSomething = GetWorld()->LineTraceSingleByObjectType(Hit, GetReachLineStart(), GetReachLineEnd(_Range), FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody), TraceParameters);
 
 	if (HitSomething)
 	{
+		AActor* ActorHit = Hit.GetActor();
 		UE_LOG(LogTemp, Warning, TEXT("Hit: %s"), *ActorHit->GetName())
 	}
 	return Hit;
 }
 
-FVector AGravityGunWeapon::GetReachLineStart() const // TODO should this be from the view of the gun?
+FVector AGravityGunWeapon::GetReachLineStart() const
 {
 	return FP_MuzzleLocation->GetComponentLocation();
 }
 
-FVector AGravityGunWeapon::GetReachLineEnd(float range) const
+FVector AGravityGunWeapon::GetReachLineEnd(float _Range) const
 {
-	return FP_MuzzleLocation->GetComponentLocation() + (FP_MuzzleLocation->GetComponentRotation().Vector() * range);
+	return FP_MuzzleLocation->GetComponentLocation() + (FP_MuzzleLocation->GetComponentRotation().Vector() * _Range);
 }

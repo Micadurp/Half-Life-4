@@ -51,11 +51,11 @@ private:
 
 protected:
 
-	/** Primary Weapon Action */
-	void OnPrimaryAction();
-	/** Secondary Weapon Action */
+	// Activate primary action for current weapon
+	void ActivatePrimaryAction();
+	// Activate secondary action for current weapon
 	void ActivateSecondaryAction();
-	/** Secondary Weapon Action */
+	// Release secondary action for current weapon
 	void ReleaseSecondaryAction();
 
 	/** Handles moving forward/backward */

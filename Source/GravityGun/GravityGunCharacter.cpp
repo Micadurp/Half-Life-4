@@ -45,13 +45,13 @@ void AGravityGunCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
-	if (GravGunBlueprint == NULL)
+	// Attaching gun model to arm mesh
+	if (GravGunBlueprint != NULL)
 	{
-		return;
+		GravGun = GetWorld()->SpawnActor<AGravityGunWeapon>(GravGunBlueprint);
+		GravGun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+		GravGun->SetAnimInstance(Mesh1P->GetAnimInstance());
 	}
-	GravGun = GetWorld()->SpawnActor<AGravityGunWeapon>(GravGunBlueprint);
-	GravGun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
-	GravGun->AnimInstance = Mesh1P->GetAnimInstance();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -67,7 +67,7 @@ void AGravityGunCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	// Bind Weapon action events events
-	PlayerInputComponent->BindAction("WeaponPrimaryAction", IE_Pressed, this, &AGravityGunCharacter::OnPrimaryAction);
+	PlayerInputComponent->BindAction("WeaponPrimaryAction", IE_Pressed, this, &AGravityGunCharacter::ActivatePrimaryAction);
 	PlayerInputComponent->BindAction("WeaponSecondaryAction", IE_Pressed, this, &AGravityGunCharacter::ActivateSecondaryAction);
 	PlayerInputComponent->BindAction("WeaponSecondaryAction", IE_Released, this, &AGravityGunCharacter::ReleaseSecondaryAction);
 
@@ -84,7 +84,7 @@ void AGravityGunCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AGravityGunCharacter::LookUpAtRate);
 }
 
-void AGravityGunCharacter::OnPrimaryAction()
+void AGravityGunCharacter::ActivatePrimaryAction()
 {
 	GravGun->PrimaryAction();
 }

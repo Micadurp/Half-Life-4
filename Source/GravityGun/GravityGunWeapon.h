@@ -40,12 +40,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	UAnimInstance* AnimInstance;
 
-	//Primary Action of the weapon
+	// Will shoot an object away, also shoots grabbed object away if one is held
 	void PrimaryAction();
 
-	//Secondary Action of the weapon
+	// Drags objects towards weapon and grabs them, drops object if an object is grabbed
 	void ActivateSecondaryAction();
-	//Secondary Action of the weapon
+	// Stop pulling objects
 	void ReleaseSecondaryAction();
 
 protected:
@@ -55,17 +55,22 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	void SetAnimInstance(UAnimInstance* _AnimInstance);
 
 private:
+	// Range for pulling and pushing objects
 	UPROPERTY(EditAnywhere)
 	float Range = 1000.f;
 
+	// How far away to grab and object, also is distance where object is held
 	UPROPERTY(EditAnywhere)
 	float GrabReach = 300.f;
 
+	// The Impulse at which the gun shoots away objects
 	UPROPERTY(EditAnywhere)
-	float PushForce = 10000.f;
+	float PushImpulse = 10000.f;
 
+	// The force at which the gun pulls objects
 	UPROPERTY(EditAnywhere)
 	float PullForce = 1000.f;
 	
@@ -73,8 +78,10 @@ private:
 	bool pulling = false;
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;
 
-	FHitResult GetFirstBody(float range) const;
+	// Find first physics body within range
+	FHitResult GetFirstBody(float _Range) const;
+	// Gets starting point for range
 	FVector GetReachLineStart() const;
-	FVector GetReachLineEnd(float range) const;
-
+	// Gets end point of range
+	FVector GetReachLineEnd(float _Range) const;
 };
