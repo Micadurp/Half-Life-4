@@ -3,50 +3,27 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "GenericWeapon.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"	
 #include "GravityGunWeapon.generated.h"
 
 UCLASS(config=Game)
-class GRAVITYGUN_API AGravityGunWeapon : public AActor
+class GRAVITYGUN_API AGravityGunWeapon : public AGenericWeapon
 {
 	GENERATED_BODY()
 
-
-	/** Location on gun mesh where projectiles should spawn. */
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	class USceneComponent* FP_MuzzleLocation;
-
+		
 public:	
 	// Sets default values for this actor's properties
 	AGravityGunWeapon();
 
-	/** Gun mesh */
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	class USkeletalMeshComponent* Gun_Mesh;
-
-	/** Projectile class to spawn */
-	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-	TSubclassOf<class AGravityGunProjectile> ProjectileClass;
-
-	/** Sound to play each time we fire */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	class USoundBase* FireSound;
-
-	/** AnimMontage to play each time we fire */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	class UAnimMontage* FireAnimation;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	UAnimInstance* AnimInstance;
-
 	// Will shoot an object away, also shoots grabbed object away if one is held
-	void PrimaryAction();
+	void PrimaryAction() override;
 
 	// Drags objects towards weapon and grabs them, drops object if an object is grabbed
-	void ActivateSecondaryAction();
+	void ActivateSecondaryAction() override;
 	// Stop pulling objects
-	void ReleaseSecondaryAction();
+	void ReleaseSecondaryAction() override;
 
 protected:
 	// Called when the game starts or when spawned
@@ -55,7 +32,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	void SetAnimInstance(UAnimInstance* _AnimInstance);
 
 private:
 	// Range for pulling and pushing objects
@@ -68,11 +44,11 @@ private:
 
 	// The Impulse at which the gun shoots away objects
 	UPROPERTY(EditAnywhere)
-	float PushImpulse = 10000.f;
+	float PushImpulse = 4000.f;
 
 	// The force at which the gun pulls objects
 	UPROPERTY(EditAnywhere)
-	float PullForce = 1000.f;
+	float PullForce = 2000.f;
 	
 	FHitResult GravGunHit;
 	bool pulling = false;

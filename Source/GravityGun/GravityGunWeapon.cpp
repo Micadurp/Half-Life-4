@@ -14,14 +14,14 @@ AGravityGunWeapon::AGravityGunWeapon()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	// Create a gun mesh component
-	Gun_Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Gun_Mesh"));
-	Gun_Mesh->SetOnlyOwnerSee(false);
-	Gun_Mesh->bCastDynamicShadow = false;
-	Gun_Mesh->CastShadow = false;
+	Weapon_Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon_Mesh"));
+	Weapon_Mesh->SetOnlyOwnerSee(false);
+	Weapon_Mesh->bCastDynamicShadow = false;
+	Weapon_Mesh->CastShadow = false;
 
 	// Create Muzzle Location
 	FP_MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
-	FP_MuzzleLocation->SetupAttachment(Gun_Mesh);
+	FP_MuzzleLocation->SetupAttachment(Weapon_Mesh);
 	FP_MuzzleLocation->SetRelativeLocation(FVector(0.2f, 48.4f, -10.6f));
 }
 
@@ -58,7 +58,6 @@ void AGravityGunWeapon::Tick(float DeltaTime)
 			{
 				PhysicsHandle->GrabComponentAtLocation(HitComponent, NAME_None, HitComponent->GetOwner()->GetActorLocation());
 				pulling = false;
-				//PhysicsHandle->SetTargetLocation(GrabLineEnd);
 			}
 		}
 		else if (PhysicsHandle->GrabbedComponent)
@@ -69,11 +68,6 @@ void AGravityGunWeapon::Tick(float DeltaTime)
 		}
 	}
 
-}
-
-void AGravityGunWeapon::SetAnimInstance(UAnimInstance* _AnimInstance)
-{
-	AnimInstance = _AnimInstance;
 }
 
 void AGravityGunWeapon::PrimaryAction()
@@ -99,13 +93,8 @@ void AGravityGunWeapon::ActivateSecondaryAction()
 	// Check if something is grabbed already
 	if (PhysicsHandle->GetGrabbedComponent() == nullptr)
 	{
-		// Find first object in range and start pulling it
-		pulling = true;
 		GravGunHit = GetFirstBody(Range);
-		auto ComponentToGrab = GravGunHit.GetComponent();
-		auto ActorHit = GravGunHit.GetActor();
-
-		if (ActorHit)
+		if (GravGunHit.GetActor())
 		{
 			pulling = true;
 		}

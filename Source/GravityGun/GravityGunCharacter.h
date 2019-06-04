@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GravityGun/GenericWeapon.h"
 #include "GravityGun/GravityGunWeapon.h"
 #include "GravityGunCharacter.generated.h"
 
@@ -44,10 +45,10 @@ public:
 
 	/** Gun: 1st person view (seen only by self) */
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)
-	TSubclassOf<class AGravityGunWeapon> GravGunBlueprint;
+	TSubclassOf<class AGenericWeapon> GenericWeaponBlueprint;
 
 private:
-	AGravityGunWeapon * GravGun;
+	AGenericWeapon * GenericWeapon;
 
 protected:
 

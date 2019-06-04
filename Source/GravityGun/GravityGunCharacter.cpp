@@ -46,11 +46,11 @@ void AGravityGunCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	// Attaching gun model to arm mesh
-	if (GravGunBlueprint != NULL)
+	if (GenericWeaponBlueprint != NULL)
 	{
-		GravGun = GetWorld()->SpawnActor<AGravityGunWeapon>(GravGunBlueprint);
-		GravGun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
-		GravGun->SetAnimInstance(Mesh1P->GetAnimInstance());
+		GenericWeapon = GetWorld()->SpawnActor<AGenericWeapon>(GenericWeaponBlueprint);
+		GenericWeapon->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+		GenericWeapon->SetAnimInstance(Mesh1P->GetAnimInstance());
 	}
 }
 
@@ -86,17 +86,17 @@ void AGravityGunCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 
 void AGravityGunCharacter::ActivatePrimaryAction()
 {
-	GravGun->PrimaryAction();
+	GenericWeapon->PrimaryAction();
 }
 
 void AGravityGunCharacter::ActivateSecondaryAction()
 {
-	GravGun->ActivateSecondaryAction();
+	GenericWeapon->ActivateSecondaryAction();
 }
 
 void AGravityGunCharacter::ReleaseSecondaryAction()
 {
-	GravGun->ReleaseSecondaryAction();
+	GenericWeapon->ReleaseSecondaryAction();
 }
 
 void AGravityGunCharacter::MoveForward(float Value)
