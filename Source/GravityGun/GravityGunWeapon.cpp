@@ -125,18 +125,10 @@ FHitResult AGravityGunWeapon::GetFirstBody(float range) const
 
 FVector AGravityGunWeapon::GetReachLineStart() const // TODO should this be from the view of the gun?
 {
-	FVector ActorPosition;
-	FRotator ActorRotation;
-	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(ActorPosition, ActorRotation);
-
-	return ActorPosition;
+	return FP_MuzzleLocation->GetComponentLocation();
 }
 
 FVector AGravityGunWeapon::GetReachLineEnd(float range) const
 {
-	FVector ActorPosition;
-	FRotator ActorRotation;
-	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(ActorPosition, ActorRotation);
-
-	return ActorPosition + (ActorRotation.Vector() * range);
+	return FP_MuzzleLocation->GetComponentLocation() + (FP_MuzzleLocation->GetComponentRotation().Vector() * range);
 }
