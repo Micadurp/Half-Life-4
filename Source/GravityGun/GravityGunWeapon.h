@@ -67,8 +67,10 @@ private:
 	float PushForce = 10000.f;
 
 	UPROPERTY(EditAnywhere)
-	float PullForce = 20.f;
-		
+	float PullForce = 1000.f;
+	
+	FHitResult GravGunHit;
+	bool pulling = false;
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;
 
 	FHitResult GetFirstBody(float range) const;

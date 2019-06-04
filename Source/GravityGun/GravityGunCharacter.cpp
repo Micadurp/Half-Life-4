@@ -68,7 +68,7 @@ void AGravityGunCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 
 	// Bind Weapon action events events
 	PlayerInputComponent->BindAction("WeaponPrimaryAction", IE_Pressed, this, &AGravityGunCharacter::OnPrimaryAction);
-	PlayerInputComponent->BindAction("WeaponSecondaryAction", IE_Pressed, this, &AGravityGunCharacter::OnSecondaryAction);
+	PlayerInputComponent->BindAction("WeaponSecondaryAction", IE_Pressed, this, &AGravityGunCharacter::ActivateSecondaryAction);
 	PlayerInputComponent->BindAction("WeaponSecondaryAction", IE_Released, this, &AGravityGunCharacter::ReleaseSecondaryAction);
 
 	// Bind movement events
