@@ -82,22 +82,109 @@ void AGravityGunCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	PlayerInputComponent->BindAxis("TurnRate", this, &AGravityGunCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AGravityGunCharacter::LookUpAtRate);
+
+
+	PlayerInputComponent->BindAction("GrabWeapon", IE_Pressed, this, &AGravityGunCharacter::PickupWeapon);
+	PlayerInputComponent->BindAction("TossWeapon", IE_Pressed, this, &AGravityGunCharacter::ThrowWeapon);
 }
 
+// Wanted to do this but would need more time to figure out/research how
+void AGravityGunCharacter::PickupWeapon()
+{ 
+	return;
+	/*TArray<AActor*> Weapons;
+	GetOwner()->GetOverlappingActors(Weapons, TSubclassOf<AGenericWeapon>());
+
+	for (AActor* Weapon : Weapons)
+	{
+		//((AGenericWeapon*) Weapon)->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+		//((AGenericWeapon*) Weapon)->SetAnimInstance(Mesh1P->GetAnimInstance());
+	}*/
+}
+
+// Wanted to do this but would need more time to figure out/research how
+void AGravityGunCharacter::ThrowWeapon()
+{
+
+	return;
+	//GenericWeapon->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+	//GenericWeapon->SetAnimInstance(nullptr);
+}
+
+#pragma region ActivatePrimaryAction
+
+/* Three functions that propagate the action over the network */
 void AGravityGunCharacter::ActivatePrimaryAction()
 {
 	GenericWeapon->PrimaryAction();
+
+	if (Role < ROLE_Authority)
+	{
+		ServerActivatePrimaryAction();
+	}
 }
 
+bool AGravityGunCharacter::ServerActivatePrimaryAction_Validate()
+{
+	return true;
+}
+
+void AGravityGunCharacter::ServerActivatePrimaryAction_Implementation()
+{
+	ActivatePrimaryAction();
+}
+
+#pragma endregion
+
+#pragma region ActivateSecondaryAction
+
+/* Three functions that propagate the action over the network */
 void AGravityGunCharacter::ActivateSecondaryAction()
 {
 	GenericWeapon->ActivateSecondaryAction();
+
+	if (Role < ROLE_Authority)
+	{
+		ServerActivateSecondaryAction();
+	}
 }
 
+bool AGravityGunCharacter::ServerActivateSecondaryAction_Validate()
+{
+	return true;
+}
+
+void AGravityGunCharacter::ServerActivateSecondaryAction_Implementation()
+{
+	ActivateSecondaryAction();
+}
+
+#pragma endregion
+
+#pragma region ActivateSecondaryAction
+
+/* Three functions that propagate the action over the network */
 void AGravityGunCharacter::ReleaseSecondaryAction()
 {
 	GenericWeapon->ReleaseSecondaryAction();
+
+	if (Role < ROLE_Authority)
+	{
+		ServerReleaseSecondaryAction();
+	}
 }
+
+bool AGravityGunCharacter::ServerReleaseSecondaryAction_Validate()
+{
+	return true;
+}
+
+void AGravityGunCharacter::ServerReleaseSecondaryAction_Implementation()
+{
+	ReleaseSecondaryAction();
+}
+
+#pragma endregion
 
 void AGravityGunCharacter::MoveForward(float Value)
 {

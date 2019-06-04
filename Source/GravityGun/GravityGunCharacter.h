@@ -54,10 +54,22 @@ protected:
 
 	// Activate primary action for current weapon
 	void ActivatePrimaryAction();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerActivatePrimaryAction();
+
 	// Activate secondary action for current weapon
 	void ActivateSecondaryAction();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerActivateSecondaryAction();
+
 	// Release secondary action for current weapon
 	void ReleaseSecondaryAction();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerReleaseSecondaryAction();
+
 
 	/** Handles moving forward/backward */
 	void MoveForward(float Val);
@@ -96,6 +108,10 @@ public:
 	FORCEINLINE class USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	/** Returns FirstPersonCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+
+	void PickupWeapon();
+	void ThrowWeapon();
+
 
 };
 

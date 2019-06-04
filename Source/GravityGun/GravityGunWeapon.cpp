@@ -12,6 +12,7 @@
 AGravityGunWeapon::AGravityGunWeapon()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
 	
 	// Create a gun mesh component
 	Weapon_Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon_Mesh"));
@@ -44,32 +45,7 @@ void AGravityGunWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// Don't crash if Physics Handle isn't added
-	if (PhysicsHandle != nullptr) 
-	{
-		auto GravGunHit = GetFirstBody(Range);
-		// If we are pulling and we have hit an actor, give object a force towards the weapon
-		if (pulling && GravGunHit.GetActor() != nullptr)
-		{
-			auto HitComponent = GravGunHit.GetComponent();
-			FVector Direction = GetReachLineStart() - HitComponent->GetComponentLocation();
-			Direction.Normalize();
-			HitComponent->AddForce(Direction * PullForce, NAME_None, true);
-
-			if (FVector::Dist(GetReachLineStart(), HitComponent->GetComponentLocation()) < GrabReach)
-			{
-				PhysicsHandle->GrabComponentAtLocation(HitComponent, NAME_None, HitComponent->GetOwner()->GetActorLocation());
-				pulling = false;
-			}
-		}
-		else if (PhysicsHandle->GrabbedComponent)
-		{
-			// If a we have grabbed something hold it infront
-			FVector GrabLineEnd = GetReachLineEnd(GrabReach);
-			PhysicsHandle->SetTargetLocation(GrabLineEnd);
-		}
-	}
-
+	PullAndGrab();
 }
 
 void AGravityGunWeapon::PrimaryAction()
@@ -128,6 +104,35 @@ void AGravityGunWeapon::ReleaseSecondaryAction()
 	{
 		PhysicsHandle->ReleaseComponent();
 		pulling = false;
+	}
+}
+
+void AGravityGunWeapon::PullAndGrab()
+{
+	// Don't crash if Physics Handle isn't added
+	if (PhysicsHandle != nullptr)
+	{
+		auto GravGunHit = GetFirstBody(Range);
+		// If we are pulling and we have hit an actor, give object a force towards the weapon
+		if (pulling && GravGunHit.GetActor() != nullptr)
+		{
+			auto HitComponent = GravGunHit.GetComponent();
+			FVector Direction = GetReachLineStart() - HitComponent->GetComponentLocation();
+			Direction.Normalize();
+			HitComponent->AddForce(Direction * PullForce, NAME_None, true);
+
+			if (FVector::Dist(GetReachLineStart(), HitComponent->GetComponentLocation()) < GrabReach)
+			{
+				PhysicsHandle->GrabComponentAtLocation(HitComponent, NAME_None, HitComponent->GetOwner()->GetActorLocation());
+				pulling = false;
+			}
+		}
+		else if (PhysicsHandle->GrabbedComponent)
+		{
+			// If a we have grabbed something hold it infront
+			FVector GrabLineEnd = GetReachLineEnd(GrabReach);
+			PhysicsHandle->SetTargetLocation(GrabLineEnd);
+		}
 	}
 }
 

@@ -53,6 +53,8 @@ private:
 	bool pulling = false;
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;
 
+	void PullAndGrab();
+
 	// Find first physics body within range
 	FHitResult GetFirstBody(float _Range) const;
 	// Gets starting point for range
