@@ -46,6 +46,7 @@ void AGravityGunWeapon::Tick(float DeltaTime)
 	// Don't crash if Physics Handle isn't added
 	if (PhysicsHandle != nullptr) 
 	{
+		auto GravGunHit = GetFirstBody(Range);
 		// If we are pulling and we have hit an actor, give object a force towards the weapon
 		if (pulling && GravGunHit.GetActor() != nullptr)
 		{
@@ -93,11 +94,7 @@ void AGravityGunWeapon::ActivateSecondaryAction()
 	// Check if something is grabbed already
 	if (PhysicsHandle->GetGrabbedComponent() == nullptr)
 	{
-		GravGunHit = GetFirstBody(Range);
-		if (GravGunHit.GetActor())
-		{
-			pulling = true;
-		}
+		pulling = true;
 	}
 	else
 	{ 
@@ -126,11 +123,11 @@ FHitResult AGravityGunWeapon::GetFirstBody(float _Range) const
 	// Checks if any physics objects are in range
 	HitSomething = GetWorld()->LineTraceSingleByObjectType(Hit, GetReachLineStart(), GetReachLineEnd(_Range), FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody), TraceParameters);
 
-	if (HitSomething)
+	/*if (HitSomething) // Good for debuging
 	{
 		AActor* ActorHit = Hit.GetActor();
 		UE_LOG(LogTemp, Warning, TEXT("Hit: %s"), *ActorHit->GetName())
-	}
+	}*/
 	return Hit;
 }
 

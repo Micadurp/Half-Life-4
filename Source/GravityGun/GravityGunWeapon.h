@@ -50,7 +50,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	float PullForce = 2000.f;
 	
-	FHitResult GravGunHit;
 	bool pulling = false;
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;
 
